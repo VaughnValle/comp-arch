@@ -32,38 +32,26 @@ global _start
 ; This function prints to the console the decimal representation
 ; of its 32-bit parameter, which is passed in EAX.
 print_int:
-
-    ;; TODO Your code goes here
-    ;; Your code should examine the 32-bit unsigned integer
-    ;; in EAX, and convert it into an ASCII string, stored
-    ;; in the 16-byte buffer, and then print it using 
-    ;; the write syscall.
-    mov ebp, esp
-    mov edx, eax
-    mov ecx, [ebp+16]
+    mov edi, end_of_buffer    ; Start from the end of the buffer
+    mov ecx, 10               ; Divide by 10 in each iteration
 
 loop:
-    ; subroutine to repeatedly divide by 10
-    mov ebx, 10 ; move 10 to ebx
-    xor eax, eax ; init eax to 0
-    div ebx ; divide by 10
-    add eax, '0' ; add '0' to convert binary to ASCII
-    push eax
+    xor edx, edx              ; Clear EDX for division (required)
+    div ecx                   ; Divide EAX by 10; quotient -> EAX, remainder -> EDX
+    add dl, 48                ; Convert remainder to ASCII
+    dec edi                   ; Move to the previous byte in the buffer
+    mov [edi], dl             ; Store the ASCII character in the buffer
+    cmp eax, 0                ; Compare EAX with 0
+    jne loop                  ; If not equal (not zero), continue the loop
 
-    ; check if quotient in edx is zero, if not, then we still need to divide more
-    cmp edx, 0 ; if not equal to zero, loop again
-    jne loop
-
-    ; else print decimal
-    mov ebx, STDOUT
-    mov eax, SYS_WRITE
-    mov ecx, [ebp+16]
-    mov edx, esp 
-    int 80h
-
-    ; done
-    ;pop ebp
-    ret                     ; return to caller
+    mov eax, 4                ; Syscall 4 (write)
+    mov ebx, 1                ; File descriptor 1 (stdout)
+    mov ecx, edi              ; Address of the first character in the buffer
+    mov esi, end_of_buffer    ; Address of the end of the buffer
+    sub esi, edi              ; Calculate the string length
+    mov edx, esi              ; Set the string length to EDX
+    int 80h                   ; Perform the syscall (write)
+    ret                       ; Return to caller
 
 ; This function simply prints the newline character to stdout
 ; by invoking syscall 4. It overwrites the first character
