@@ -1,10 +1,8 @@
 1.
-my_data: 0x01234560
-add eax, 2, my_data: 0x01234562
-my_data+2: 0xff, my_data: 0x012345ff
-add eax, 1, my_data: 0x01234600
-my_data+3: 0xabcdabcd, my_data: 0xabcdabcd
-Final value: 0xabcdabcd
+my_data: 0x0123456
+my_data+2: 0xff
+my_data+3: 0xabcdabcd
+
 2.
 a. The program calculates the sum of all the absolute values of elements in the array. The final value of [d] is 105. [arr + i] += [arr + 2]
 b. The program checks if value in edx = 0. If it is, then it doesn't loop and proceeds to the end. This works because the last element in arr is 0.
